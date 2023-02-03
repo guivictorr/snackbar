@@ -12,29 +12,15 @@ import React, {
   createContext,
   PropsWithChildren,
   useContext,
-  useEffect,
   useState,
 } from 'react'
-import { StyleSheet, Dimensions } from 'react-native'
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-  SlideInUp,
-  SlideInDown,
-  SlideOutDown,
-} from 'react-native-reanimated'
+import { StyleSheet } from 'react-native'
+import Animated, { SlideInDown, SlideOutDown } from 'react-native-reanimated'
 import Ionicons from '@expo/vector-icons/Ionicons'
-
-enum SnackbarVariantsEnum {
-  SUCCESS = '#00ff00',
-  ERROR = '#ff0000',
-}
 
 type SnackOptions = {
   title: string
   description: string
-  variant?: keyof typeof SnackbarVariantsEnum
 }
 
 type SnackbarContextProps = {
@@ -43,15 +29,12 @@ type SnackbarContextProps = {
 }
 
 export const SnackbarContext = createContext({} as SnackbarContextProps)
-let timeout: NodeJS.Timeout
 
-const wait = (delay: number = 500) =>
-  new Promise((resolve) => setTimeout(() => resolve(null), delay))
+let timeout: NodeJS.Timeout
 
 const SnackbarProvider = ({ children }: PropsWithChildren) => {
   const [snackOptions, setSnackOptions] = useState<SnackOptions | null>(null)
 
-  // const theme = useTheme()
   const closeSnackbar = () => {
     setSnackOptions(null)
     clearTimeout(timeout)
@@ -65,6 +48,10 @@ const SnackbarProvider = ({ children }: PropsWithChildren) => {
   }
 
   const openSnackbar = async (options: SnackOptions) => {
+    if (snackOptions) {
+      await closeSnackbar()
+    }
+
     setSnackOptions((prevState) => ({ ...prevState, ...options }))
     closeSnackAfterSomeTime()
   }
@@ -76,14 +63,7 @@ const SnackbarProvider = ({ children }: PropsWithChildren) => {
         <Animated.View
           entering={SlideInDown.duration(500)}
           exiting={SlideOutDown.duration(500)}
-          style={[
-            {
-              ...styles.bottomSheet,
-              backgroundColor:
-                snackOptions.variant === 'ERROR' ? '#ff0000' : '#00ff00',
-            },
-            // style,
-          ]}
+          style={styles.bottomSheet}
         >
           <HStack justifyContent="space-between">
             <VStack>
@@ -122,6 +102,7 @@ const styles = StyleSheet.create({
     paddingBottom: 14,
     paddingHorizontal: 26,
     height: 150,
+    backgroundColor: 'tomato',
     bottom: 0,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
@@ -135,9 +116,8 @@ function Home() {
       <Button
         onPress={() =>
           openSnackbar({
-            description: 'desc',
-            title: 'title',
-            variant: 'ERROR',
+            description: 'Snack 1',
+            title: 'Snack 1',
           })
         }
       >
@@ -146,9 +126,8 @@ function Home() {
       <Button
         onPress={() =>
           openSnackbar({
-            description: 'desc',
-            title: 'title',
-            variant: 'SUCCESS',
+            description: 'Snack 2',
+            title: 'Snack 2',
           })
         }
       >
