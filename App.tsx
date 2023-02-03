@@ -69,12 +69,6 @@ const SnackbarProvider = ({ children }: PropsWithChildren) => {
     closeSnackAfterSomeTime()
   }
 
-  useEffect(() => {
-    if (snackOptions !== null) {
-      closeSnackbar()
-    }
-  }, [snackOptions])
-
   return (
     <SnackbarContext.Provider value={{ openSnackbar, closeSnackbar }}>
       {children}
